@@ -1,0 +1,26 @@
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-active24
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: operations@synottech.com
+    privateKeySecretRef:
+      name: letsencrypt-active24-account-key
+    solvers:
+      - selector:
+          dnsZones:
+            - synot.tech
+        dns01:
+          webhook:
+            groupName: acme.yourdomain.tld
+            solverName: active24
+            config:
+              apiSecretRef:
+                name: active24-credentials
+              # optional, defaults shown:
+              # apiUserKey: apiUser
+              # apiSecretKey: apiSecret
+              # apiUrl: https://rest.active24.cz
+              domain: synot.tech

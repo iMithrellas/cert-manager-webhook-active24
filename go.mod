@@ -20,7 +20,6 @@ toolchain go1.22.3
 
 require (
 	github.com/cert-manager/cert-manager v1.16.3
-	github.com/rkosegi/active24-go v1.0.1
 	k8s.io/api v0.31.1
 	k8s.io/apiextensions-apiserver v0.31.1
 	k8s.io/apimachinery v0.31.1
