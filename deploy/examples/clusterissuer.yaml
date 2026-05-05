@@ -14,12 +14,13 @@
 #
 ---
 apiVersion: v1
-data:
-  apiKey: Rut/FiPML2Jv2hSjhg0HUAs825pa2zfapbou6W9cpatDijWhmZ5e1x602pmQQA9ztlg6eHyJR2tj
 kind: Secret
 metadata:
   namespace: cert-manager
-  name: active24-apikey
+  name: active24-credentials
+stringData:
+  apiUser: my-api-user
+  apiSecret: my-api-password-or-token
 ---
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
@@ -42,9 +43,12 @@ spec:
           groupName: acme.yourdomain.tld
           solverName: active24
           config:
-            apiKeySecretRef:
-              name: 'active24-apikey'
-              key: 'apiKey'
+            apiSecretRef:
+              name: active24-credentials
+            # optional overrides:
+            # apiUserKey: apiUser
+            # apiSecretKey: apiSecret
+            # apiUrl: https://rest.active24.cz
             domain: yourdomain.tld
 
 ---

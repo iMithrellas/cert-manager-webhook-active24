@@ -1,26 +1,41 @@
 # ACME webhook for Active24 DNS API
 
-This repository contains code and supporting files for ACME webhook that interacts with [active24.cz](https://customer.active24.com/user/api) DNS API.
+This repository contains code and supporting files for an ACME webhook that
+interacts with the [active24.cz](https://customer.active24.com/user/api) DNS
+**v2 REST API**.
+
+## Attribution
+
+This project is a fork of the original
+[rkosegi/cert-manager-webhook-active24](https://github.com/rkosegi/cert-manager-webhook-active24)
+by Richard Kosegi.
+
+The original repository appears to be archived. This fork updates the webhook to
+work with the current Active24 REST API v2, including HMAC-signed
+
+Special thanks to the
+[lego Active24 DNS provider](https://github.com/go-acme/lego/tree/master/providers/dns/internal/active24),
+which served as the reference for resolving an Active24 domain name to its
+numeric service ID via the service list endpoint before calling the v2 DNS
+record API.
 
 ## Installation
 
 ### Requirements
 
 - [cert-manager](https://cert-manager.io/docs/installation/)
+- API key and secret for the Active24 REST API
 
-- [API token](https://customer.active24.com/user/api) to access your domain
-
-Create secret with API token
+The API uses HMAC-SHA1 signed HTTP Basic authentication. Create a secret
+containing the API key and secret:
 
 ```
-kubectl create secret generic active24-apikey --namespace cert-manager \
-	--from-literal='apiKey=abcd1234567890'
+kubectl create secret generic active24-credentials --namespace cert-manager \
+    --from-literal='apiUser=my-api-key' \
+    --from-literal='apiSecret=my-api-secret'
 ```
 
-Create ClusterIssuer
-
-
-Apply following manifest into cluster
+Create a ClusterIssuer:
 
 ```yaml
 apiVersion: cert-manager.io/v1
@@ -45,21 +60,26 @@ spec:
           groupName: acme.yourdomain.tld
           solverName: active24
           config:
-            apiKeySecretRef:
-              name: 'active24-apikey'
-              key: 'apiKey'
+            apiSecretRef:
+              name: active24-credentials
+              # namespace is optional; defaults to the resource namespace
+              # namespace: cert-manager
+            # optional overrides (defaults shown):
+            # apiUserKey: apiUser
+            # apiSecretKey: apiSecret
+            # apiUrl: https://rest.active24.cz
             domain: somegreatdomain.tld
 ```
 
-Replace `somegreatdomain.tld` with actual domain managed by Active24
+Replace `somegreatdomain.tld` with the actual domain managed by Active24.
 
-Install using helm
+Install using helm:
 
 ```
 helm upgrade --install ac24 ./chart --namespace cert-manager
 ```
 
-Create certificate
+Create a certificate:
 
 ```yaml
 kind: Certificate
@@ -76,3 +96,12 @@ spec:
     name: letsencrypt-prod
   secretName: somegreatdomain.tld-tls
 ```
+
+## Migrating from the legacy v1 API configuration
+
+The previous configuration field `apiKeySecretRef` (single API key) has been
+replaced by `apiSecretRef`, which points at a Secret containing two keys:
+`apiUser` and `apiSecret`. The default base URL has changed from
+`https://api.active24.com` to `https://rest.active24.cz`. The webhook resolves
+the numeric Active24 service ID automatically from the configured `domain` using
+the service list endpoint before calling the v2 DNS record API.
