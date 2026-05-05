@@ -4,6 +4,21 @@ This repository contains code and supporting files for an ACME webhook that
 interacts with the [active24.cz](https://customer.active24.com/user/api) DNS
 **v2 REST API**.
 
+## Attribution
+
+This project is a fork of the original
+[rkosegi/cert-manager-webhook-active24](https://github.com/rkosegi/cert-manager-webhook-active24)
+by Richard Kosegi.
+
+The original repository appears to be archived. This fork updates the webhook to
+work with the current Active24 REST API v2, including HMAC-signed
+
+Special thanks to the
+[lego Active24 DNS provider](https://github.com/go-acme/lego/tree/master/providers/dns/internal/active24),
+which served as the reference for resolving an Active24 domain name to its
+numeric service ID via the service list endpoint before calling the v2 DNS
+record API.
+
 ## Installation
 
 ### Requirements
