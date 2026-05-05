@@ -1,7 +1,7 @@
 {
-  "apiKeySecretRef": {
-    "name":  "apikey"
+  "apiSecretRef": {
+    "name": "active24-credentials"
   },
   "domain": "mydomain.tld",
-  "apiUrl" : "https://api.active24.com/dns"
+  "apiUrl": "https://rest.active24.cz"
 }
